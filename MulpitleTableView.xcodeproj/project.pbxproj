@@ -13,6 +13,7 @@
 		FE29A8FE1D2E2A1A00235D88 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FE29A8FC1D2E2A1A00235D88 /* Main.storyboard */; };
 		FE29A9001D2E2A1A00235D88 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FE29A8FF1D2E2A1A00235D88 /* Assets.xcassets */; };
 		FE29A9031D2E2A1A00235D88 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FE29A9011D2E2A1A00235D88 /* LaunchScreen.storyboard */; };
+		FE29A9141D2E3AA500235D88 /* MultipleListTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = FE29A9131D2E3AA500235D88 /* MultipleListTableView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +27,8 @@
 		FE29A8FF1D2E2A1A00235D88 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		FE29A9021D2E2A1A00235D88 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		FE29A9041D2E2A1A00235D88 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FE29A9121D2E3AA500235D88 /* MultipleListTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MultipleListTableView.h; sourceTree = "<group>"; };
+		FE29A9131D2E3AA500235D88 /* MultipleListTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MultipleListTableView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -42,6 +45,8 @@
 		FE29A8E71D2E2A1900235D88 = {
 			isa = PBXGroup;
 			children = (
+				FE29A9121D2E3AA500235D88 /* MultipleListTableView.h */,
+				FE29A9131D2E3AA500235D88 /* MultipleListTableView.m */,
 				FE29A8F21D2E2A1A00235D88 /* MulpitleTableView */,
 				FE29A8F11D2E2A1A00235D88 /* Products */,
 			);
@@ -150,6 +155,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FE29A8FB1D2E2A1A00235D88 /* ViewController.m in Sources */,
+				FE29A9141D2E3AA500235D88 /* MultipleListTableView.m in Sources */,
 				FE29A8F81D2E2A1A00235D88 /* AppDelegate.m in Sources */,
 				FE29A8F51D2E2A1A00235D88 /* main.m in Sources */,
 			);
