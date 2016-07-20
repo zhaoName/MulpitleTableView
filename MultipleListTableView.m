@@ -8,10 +8,10 @@
 
 #import "MultipleListTableView.h"
 
+
 @interface MultipleListTableView ()
 
 @property (nonatomic, strong) UITableView *tableView;
-@property (nonatomic, strong) NSIndexPath *openOrCloseIndexPath;
 
 @end
 
@@ -21,11 +21,13 @@
 {
     if([super initWithFrame:frame])
     {
-        self.tableView = [[UITableView alloc] initWithFrame:frame style:style];
+        self.tableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, frame.size.width, frame.size.height) style:style];
         
         self.tableView.delegate = self;
         self.tableView.dataSource = self;
-        
+        self.tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
+        self.tableView.backgroundColor = [UIColor clearColor];
+       
         [self addSubview:self.tableView];
         
         self.isNeedTapHeader = NO;
@@ -33,6 +35,54 @@
         self.openOrCloseIndexPath = [NSIndexPath indexPathForRow:-1 inSection:-1];
     }
     return self;
+}
+
+- (void)layoutSubviews
+{
+    [super layoutSubviews];
+    self.tableView.backgroundColor = self.tableViewColor;
+}
+
+#pragma mark -- MJRefresh
+
+- (void)addNormalRefreshHeader:(EmanMJRefreshHeader)refreshHeader
+{
+    self.tableView.mj_header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
+       
+        refreshHeader();
+    }];
+}
+
+- (void)addNormalRefreshFooter:(EmanMJRefreshFooter)refreshFooter
+{
+    self.tableView.mj_footer = [MJRefreshBackNormalFooter footerWithRefreshingBlock:^{
+        
+        refreshFooter();
+    }];
+}
+
+//开始上拉刷新
+- (void)beginHeaderRefresh
+{
+    [self.tableView.mj_header beginRefreshing];
+}
+
+//开始下拉加载
+- (void)beginFooterRefresh
+{
+    [self.tableView.mj_header beginRefreshing];
+}
+
+//结束下拉刷新
+- (void)endHeaderRefresh
+{
+    [self.tableView.mj_header endRefreshing];
+}
+
+//结束上拉加载
+- (void)endFooterRefresh
+{
+    [self.tableView.mj_footer endRefreshing];
 }
 
 #pragma mark -- 重用机制
@@ -50,6 +100,17 @@
 - (id)dequeueReusableHeaderFooterViewWithIdentifier:(NSString *)identifier
 {
     return [self.tableView dequeueReusableHeaderFooterViewWithIdentifier:identifier];
+}
+
+- (UITableViewCell *)cellAtIndexPath:(NSIndexPath *)indexPath
+{
+   return [self.tableView cellForRowAtIndexPath:indexPath];
+}
+
+- (void)mlTableViewReload
+{
+    self.openOrCloseIndexPath = [NSIndexPath indexPathForRow:-1 inSection:-1];
+    [self.tableView reloadData];
 }
 
 #pragma mark -- 给header或cell添加手势 移除手势
@@ -194,6 +255,7 @@
         
         hr += hc;
     }
+    
     return hr;
 }
 
@@ -288,9 +350,6 @@
 {
     NSMutableArray *reloadIndexPaths = [NSMutableArray array];
     
-    NSInteger oldRow = self.openOrCloseIndexPath.row;
-    NSInteger newRow = indexPath.row;
-    
     //第一次点击 cell未展开
     if(self.openOrCloseIndexPath.row <= -1)
     {
@@ -298,7 +357,7 @@
     }
     else
     {
-        if(oldRow == newRow)//两次点击的是都一个cell
+        if([indexPath compare:self.openOrCloseIndexPath] == NSOrderedSame)//两次点击的是都一个cell
         {
             reloadIndexPaths = [self deleteTableViewCellAtIndexPath:self.openOrCloseIndexPath];
         }
@@ -307,11 +366,6 @@
             [reloadIndexPaths addObjectsFromArray:[self deleteTableViewCellAtIndexPath:self.openOrCloseIndexPath]];
             [reloadIndexPaths addObjectsFromArray:[self InsertTableViewCellAtIndexPath:indexPath]];
         }
-    }
-    
-    for(NSIndexPath * indexPath in reloadIndexPaths)
-    {
-        NSLog(@"%lu %lu", indexPath.section, indexPath.row);
     }
     //更新特定row
     [self.tableView reloadRowsAtIndexPaths:reloadIndexPaths withRowAnimation:UITableViewRowAnimationFade];
@@ -326,7 +380,7 @@
 {
     self.openOrCloseIndexPath = [NSIndexPath indexPathForRow:indexPath.row inSection:indexPath.section];
     
-    return [NSMutableArray arrayWithObject:self.openOrCloseIndexPath];
+    return [NSMutableArray arrayWithObject:indexPath];
 }
 
 /**
@@ -336,11 +390,10 @@
  */
 - (NSMutableArray *)deleteTableViewCellAtIndexPath:(NSIndexPath *)indexPath
 {
-    if(indexPath.row == self.openOrCloseIndexPath.row)
+    if([indexPath compare:self.openOrCloseIndexPath] == NSOrderedSame)
     {
         self.openOrCloseIndexPath = [NSIndexPath indexPathForRow:-1 inSection:indexPath.section];
     }
-    
     return [NSMutableArray arrayWithObject:indexPath];
 }
 
@@ -503,6 +556,7 @@
     {
         hv = [self.delegate mlTableView:self heightForViewInCellAtIndexPath:indexPath];
     }
+    
     return hv;
 }
 

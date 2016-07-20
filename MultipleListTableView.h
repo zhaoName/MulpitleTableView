@@ -7,8 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "MJRefresh.h"
 
 @protocol MultipleListTableViewDelegate,MultipleListTableViewDataSource;
+typedef void(^EmanMJRefreshHeader)(void);
+typedef void(^EmanMJRefreshFooter)(void);
 
 @interface MultipleListTableView : UIView <UITableViewDelegate, UITableViewDataSource>
 
@@ -19,7 +22,8 @@
 @property (nonatomic, assign) BOOL isNeedTapCell;/**<是否给tableViewCell添加点击事件*/
 
 @property (nonatomic, strong) UIView *cellView;/**<第三级列表*/
-@property (nonatomic, strong) UIColor *cellViewColor;
+@property (nonatomic, strong) UIColor *tableViewColor;/**< tableView的背景色*/
+@property (nonatomic, strong) NSIndexPath *openOrCloseIndexPath;
 
 /**
  *  初始化自定义的mlTabelView
@@ -29,12 +33,31 @@
 - (instancetype)initWithFrame:(CGRect)frame andTableViewStyle:(UITableViewStyle)style;
 
 /**
+ *  上拉刷新  下拉加载
+ */
+- (void)addNormalRefreshHeader:(EmanMJRefreshHeader) refreshHeader;
+- (void)addNormalRefreshFooter:(EmanMJRefreshFooter) refreshFooter;
+
+//开始刷新
+- (void)beginHeaderRefresh;
+- (void)beginFooterRefresh;
+
+//结束刷新
+- (void)endHeaderRefresh;
+- (void)endFooterRefresh;
+
+/**
  *  cell的重用机制
  *  @param identifier 重用标志符
  */
 - (id)dequeueReusableCellWithIdentifier:(NSString *)identifier;
 - (id)dequeueReusableCellWithIdentifier:(NSString *)identifier forIndexPath:(NSIndexPath *)indexPath;
 - (id)dequeueReusableHeaderFooterViewWithIdentifier:(NSString *)identifier;
+
+/** 获取指定位置的cell*/
+- (UITableViewCell *)cellAtIndexPath:(NSIndexPath *)indexPath;
+/** 刷新数据*/
+- (void)mlTableViewReload;
 
 @end
 
