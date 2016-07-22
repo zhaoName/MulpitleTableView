@@ -19,7 +19,7 @@ typedef void(^EmanMJRefreshFooter)(void);
 @property (nonatomic, strong) id <MultipleListTableViewDataSource> dataSource;
 
 @property (nonatomic, assign) BOOL isNeedTapHeader; /**<是否给tableViewHeader添加点击事件*/
-@property (nonatomic, assign) BOOL isNeedTapCell;/**<是否给tableViewCell添加点击事件*/
+//@property (nonatomic, assign) BOOL isNeedTapCell;/**<是否给tableViewCell添加点击事件*/
 
 @property (nonatomic, strong) UIView *cellView;/**<第三级列表*/
 @property (nonatomic, strong) UIColor *tableViewColor;/**< tableView的背景色*/
@@ -92,8 +92,6 @@ typedef void(^EmanMJRefreshFooter)(void);
 @protocol MultipleListTableViewDataSource <NSObject>
 
 @required
-/** 三级列表的个数*/
-//- (NSInteger)mlTableView:(MultipleListTableView *)mlTabelView numberOfCellViewInRow:(NSInteger)row;
 - (NSInteger)mlTableView:(MultipleListTableView *)mlTabelView numberOfRowsInSection:(NSInteger)section;
 - (UITableViewCell *)mlTableView:(MultipleListTableView *)mlTabelView cellForRowAtIndexPath:(NSIndexPath *)indexPath;
 

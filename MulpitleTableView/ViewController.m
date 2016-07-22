@@ -26,11 +26,9 @@
     mlTableView.dataSource = self;
     
     mlTableView.isNeedTapHeader = YES;
-    mlTableView.isNeedTapCell = YES;
     
     mlTableView.cellView = [[UIView alloc] init];
     mlTableView.cellView.backgroundColor = [UIColor greenColor];
-    //mlTableView.cellViewColor = [UIColor greenColor];
     
     [self.view addSubview: mlTableView];
 }

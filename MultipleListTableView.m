@@ -31,7 +31,6 @@
         [self addSubview:self.tableView];
         
         self.isNeedTapHeader = NO;
-        self.isNeedTapCell = NO;
         self.openOrCloseIndexPath = [NSIndexPath indexPathForRow:-1 inSection:-1];
     }
     return self;
@@ -182,27 +181,13 @@
 //cell将要显示
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if(self.isNeedTapCell)
-    {
-        [self addGuetureWithView:cell action:@selector(touchTableViewCellView:)];
-    }
-    
-    if([indexPath compare:self.openOrCloseIndexPath] == NSOrderedSame || !self.isNeedTapCell)
+    [self addGuetureWithView:cell action:@selector(touchTableViewCellView:)];
+
+    if([indexPath compare:self.openOrCloseIndexPath] == NSOrderedSame)
     {
         CGFloat cellViewHeight = [self call_HeightForCellViewInRow:indexPath];
         CGFloat cellHeight = [self call_HeightForRowAtIndexPath:indexPath];
         
-//        NSInteger ncv = [self call_NumberOfCellViewInRow:indexPath.row];
-//        if(ncv == 0 || cellHeight == 0) return;
-//        
-//        for(int i=0; i<ncv; i++)
-//        {
-//             self.cellView = [[UIView alloc] initWithFrame:CGRectMake(0, cellHeight+cellViewHeight*i, self.frame.size.width, cellViewHeight)];
-//             self.cellView.backgroundColor = self.cellViewColor;
-//            
-//            //self.cellView = view;
-//            [cell addSubview:self.cellView];
-//        }
         self.cellView.frame = CGRectMake(0, cellHeight, self.frame.size.width, cellViewHeight);
         [cell addSubview:self.cellView];
         
@@ -248,9 +233,8 @@
 {
     CGFloat hr = [self call_HeightForRowAtIndexPath:indexPath];
     
-    if([indexPath compare:self.openOrCloseIndexPath] == NSOrderedSame || !self.isNeedTapCell)
+    if([indexPath compare:self.openOrCloseIndexPath] == NSOrderedSame)
     {
-        //NSInteger ncv = [self call_NumberOfCellViewInRow:indexPath.row];
         CGFloat hc = [self call_HeightForCellViewInRow:indexPath];
         
         hr += hc;
@@ -316,9 +300,7 @@
     CGPoint point = [tap locationInView:cell];
     if(CGRectContainsPoint(cellRect, point))
     {
-//        if(self.cellView)
-//        {
-            [self openOrCloseTableViewCellAtIndexPath:indexPath];
+        [self openOrCloseTableViewCellAtIndexPath:indexPath];
     }
     
     //触发didSelect事件
@@ -518,16 +500,6 @@
     }
     return nr;
 }
-
-//- (NSInteger)call_NumberOfCellViewInRow:(NSInteger)row
-//{
-//    NSInteger ncv = 1;
-//    if([self.dataSource respondsToSelector:@selector(mlTableView:numberOfCellViewInRow:)])
-//    {
-//        ncv = [self.dataSource mlTableView:self numberOfCellViewInRow:row];
-//    }
-//    return ncv;
-//}
 
 - (CGFloat)call_HeightForHeaderInSection:(NSInteger)section
 {
