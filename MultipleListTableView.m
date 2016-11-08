@@ -11,7 +11,7 @@
 
 @interface MultipleListTableView ()
 
-@property (nonatomic, strong) UITableView *tableView;
+
 
 @end
 
@@ -27,13 +27,21 @@
         self.tableView.dataSource = self;
         self.tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
         self.tableView.backgroundColor = [UIColor clearColor];
+        self.tableView.separatorColor = [UIColor grayColor];
        
         [self addSubview:self.tableView];
         
         self.isNeedTapHeader = NO;
+        self.isNeedTapCell = NO;
         self.openOrCloseIndexPath = [NSIndexPath indexPathForRow:-1 inSection:-1];
     }
     return self;
+}
+
+- (void)refreshTableViewFrame:(CGRect)selfFrame
+{
+    if(!self.tableView) return;
+    self.tableView.frame = CGRectMake(0, 0, selfFrame.size.width, selfFrame.size.height);
 }
 
 - (void)layoutSubviews
@@ -43,45 +51,26 @@
 }
 
 #pragma mark -- MJRefresh
-
+// 上拉刷新
 - (void)addNormalRefreshHeader:(EmanMJRefreshHeader)refreshHeader
 {
-    self.tableView.mj_header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
-       
+    MJRefreshNormalHeader *header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
+        
         refreshHeader();
     }];
+    self.tableView.mj_header = header;
+    self.zMJHeader = header;
 }
 
+// 下拉加载
 - (void)addNormalRefreshFooter:(EmanMJRefreshFooter)refreshFooter
 {
-    self.tableView.mj_footer = [MJRefreshBackNormalFooter footerWithRefreshingBlock:^{
-        
+    MJRefreshAutoNormalFooter *footer = [MJRefreshAutoNormalFooter footerWithRefreshingBlock:^{
+    
         refreshFooter();
     }];
-}
-
-//开始上拉刷新
-- (void)beginHeaderRefresh
-{
-    [self.tableView.mj_header beginRefreshing];
-}
-
-//开始下拉加载
-- (void)beginFooterRefresh
-{
-    [self.tableView.mj_header beginRefreshing];
-}
-
-//结束下拉刷新
-- (void)endHeaderRefresh
-{
-    [self.tableView.mj_header endRefreshing];
-}
-
-//结束上拉加载
-- (void)endFooterRefresh
-{
-    [self.tableView.mj_footer endRefreshing];
+    self.tableView.mj_footer = footer;
+    self.zMJFooter = footer;
 }
 
 #pragma mark -- 重用机制
@@ -101,15 +90,17 @@
     return [self.tableView dequeueReusableHeaderFooterViewWithIdentifier:identifier];
 }
 
-- (UITableViewCell *)cellAtIndexPath:(NSIndexPath *)indexPath
-{
-   return [self.tableView cellForRowAtIndexPath:indexPath];
-}
+#pragma mark -- cell操作
 
 - (void)mlTableViewReload
 {
     self.openOrCloseIndexPath = [NSIndexPath indexPathForRow:-1 inSection:-1];
     [self.tableView reloadData];
+}
+
+- (void)mlTableViewDeleteRowAtIndexPath:(NSArray<NSIndexPath *> *)indexPaths
+{
+    [self.tableView deleteRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationFade];
 }
 
 #pragma mark -- 给header或cell添加手势 移除手势
@@ -181,16 +172,22 @@
 //cell将要显示
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    [self addGuetureWithView:cell action:@selector(touchTableViewCellView:)];
-
-    if([indexPath compare:self.openOrCloseIndexPath] == NSOrderedSame)
+    if(self.isNeedTapCell)
+    {
+        [self addGuetureWithView:cell action:@selector(touchTableViewCellView:)];
+    }
+    
+    if([indexPath compare:self.openOrCloseIndexPath] == NSOrderedSame || !self.isNeedTapCell)
     {
         CGFloat cellViewHeight = [self call_HeightForCellViewInRow:indexPath];
         CGFloat cellHeight = [self call_HeightForRowAtIndexPath:indexPath];
         
-        self.cellView.frame = CGRectMake(0, cellHeight, self.frame.size.width, cellViewHeight);
-        [cell addSubview:self.cellView];
-        
+        for(int i=0; i<self.cellViewArray.count; i++)
+        {
+            UIView *cellView = self.cellViewArray[i];
+            cellView.frame = CGRectMake(0, cellHeight + cellViewHeight*i, self.frame.size.width, cellViewHeight);
+            [cell insertSubview:cellView atIndex:0];
+        }
     }
 }
 
@@ -198,9 +195,12 @@
 {
     [self removeGestureFromView:cell];
     
-    if([cell.subviews containsObject:self.cellView])
+    for(UIView *cellView in self.cellViewArray)
     {
-        [self.cellView removeFromSuperview];
+        if([cell.subviews containsObject:cellView])
+        {
+            [cellView removeFromSuperview];
+        }
     }
 }
 
@@ -233,11 +233,12 @@
 {
     CGFloat hr = [self call_HeightForRowAtIndexPath:indexPath];
     
-    if([indexPath compare:self.openOrCloseIndexPath] == NSOrderedSame)
+    if([indexPath compare:self.openOrCloseIndexPath] == NSOrderedSame || !self.isNeedTapCell)
     {
+        NSInteger ncv = [self call_NumberOfCellViewInRow:indexPath.row];
         CGFloat hc = [self call_HeightForCellViewInRow:indexPath];
         
-        hr += hc;
+        hr += (hc * ncv);
     }
     
     return hr;
@@ -499,6 +500,16 @@
         nr = [self.dataSource mlTableView:self numberOfRowsInSection:section];
     }
     return nr;
+}
+
+- (NSInteger)call_NumberOfCellViewInRow:(NSInteger)row
+{
+    NSInteger ncv = 1;
+    if([self.dataSource respondsToSelector:@selector(mlTableView:numberOfCellViewInRow:)])
+    {
+        ncv = [self.dataSource mlTableView:self numberOfCellViewInRow:row];
+    }
+    return ncv;
 }
 
 - (CGFloat)call_HeightForHeaderInSection:(NSInteger)section

@@ -25,10 +25,14 @@
     mlTableView.delegate = self;
     mlTableView.dataSource = self;
     
-    mlTableView.isNeedTapHeader = YES;
+    mlTableView.isNeedTapHeader = NO;
+    mlTableView.isNeedTapCell = YES;
     
-    mlTableView.cellView = [[UIView alloc] init];
-    mlTableView.cellView.backgroundColor = [UIColor greenColor];
+    UIView *view1 = [[UIView alloc] init];
+    view1.backgroundColor = [UIColor greenColor];
+    UIView *view2 = [[UIView alloc] init];
+    view2.backgroundColor = [UIColor blueColor];
+    mlTableView.cellViewArray = @[view1, view2];
     
     [self.view addSubview: mlTableView];
 }
@@ -74,10 +78,10 @@
 }
 
 //三级列表的个数
-//- (NSInteger)mlTableView:(MultipleListTableView *)mlTabelView numberOfCellViewInRow:(NSInteger)row
-//{
-//    return 3;
-//}
+- (NSInteger)mlTableView:(MultipleListTableView *)mlTabelView numberOfCellViewInRow:(NSInteger)row
+{
+    return 2;
+}
 
 - (UITableViewCell *)mlTableView:(MultipleListTableView *)mlTabelView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
@@ -104,7 +108,7 @@
     view.userInteractionEnabled = YES;
     
     view.layer.borderWidth = 1.0;
-    view.layer.borderColor = [UIColor redColor].CGColor;
+    view.layer.borderColor = [UIColor purpleColor].CGColor;
     
     return view;
 }
